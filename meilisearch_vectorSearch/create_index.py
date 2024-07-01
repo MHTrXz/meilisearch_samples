@@ -18,7 +18,7 @@ def vectorize_documents():
 
     for movie in movies:
         print(movie["id"], movie["title"])
-        vector = document_to_vector(movie["title"]).tolist()
+        vector = document_to_vector(f"{movie['title']} {movie['overview']}").tolist()
         client.index('movies-vectorized').update_documents([{
             'id': movie["id"],
             '_vectors': {"bart": vector}
@@ -29,7 +29,11 @@ if __name__ == "__main__":
     embeddings = {
         "bart": {
             "source": "userProvided",
-            "dimensions": 768
+            "dimensions": 768,
+            "distribution": {
+                "mean": 0.1,
+                "sigma": 0.1
+            }
         },
         "huggingFace": {
             "source": "huggingFace",
@@ -43,8 +47,8 @@ if __name__ == "__main__":
     # create_index()
     # vectorize_documents()
 
-    # print(client.index('movies-vectorized').update_embedders(embeddings))
-
+    client.index('movies-vectorized').update_embedders(embeddings)
+    print(client.index('movies-vectorized').get_tasks().results[0])
     print(client.index('movies-vectorized').get_embedders())
 
 

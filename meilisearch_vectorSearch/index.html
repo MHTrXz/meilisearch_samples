@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .search-box {
+            margin: 20px;
+        }
+        .results {
+            margin: 20px;
+        }
+        .result-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .result-item img {
+            max-width: 100px;
+            margin-right: 20px;
+        }
+        .result-details {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="search-box">
+    <input type="text" id="searchQuery" placeholder="Search...">
+    <button onclick="search()">Search</button>
+</div>
+
+<div class="results" id="results"></div>
+
+<script>
+    function search() {
+        const query = document.getElementById('searchQuery').value;
+        fetch(`http://localhost:8000/search?query=${query}`, {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(data => displayResults(data.hits))
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    function displayResults(data) {
+        const resultsContainer = document.getElementById('results');
+        resultsContainer.innerHTML = '';  // Clear previous results
+
+        data.forEach(item => {
+            const resultItem = document.createElement('div');
+            resultItem.className = 'result-item';
+
+            const poster = document.createElement('img');
+            poster.src = item.poster;
+            poster.alt = item.title;
+
+            const details = document.createElement('div');
+            details.className = 'result-details';
+
+            const title = document.createElement('h3');
+            title.textContent = item.title;
+
+            const overview = document.createElement('p');
+            overview.textContent = item.overview;
+
+            const genres = document.createElement('p');
+            genres.textContent = `Genres: ${item.genres.join(', ')}`;
+
+            details.appendChild(title);
+            details.appendChild(overview);
+            details.appendChild(genres);
+
+            resultItem.appendChild(poster);
+            resultItem.appendChild(details);
+
+            resultsContainer.appendChild(resultItem);
+        });
+    }
+</script>
+
+</body>
+</html>
